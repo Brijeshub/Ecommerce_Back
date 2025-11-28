@@ -2,16 +2,52 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 
-const app = express();
-const PORT = process.env.PORT || 5001;
+// const app = express();
+// const PORT = process.env.PORT || 5001;
 
-app.use(cors());
+// app.use(cors());
+// app.use(express.json());
+
+// mongoose.connect('mongodb://localhost:27017/ecommerce-db', {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+// });
+
+
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+
+const app = express();
 app.use(express.json());
 
-mongoose.connect('mongodb://localhost:27017/ecommerce-db', {
+// Allow Netlify origin only (use ENV)
+const allowedOrigin = process.env.FRONTEND_URL || '*';
+app.use(cors({ origin: allowedOrigin }));
+
+// ENV variables
+const PORT = process.env.PORT || 3000;
+const MONGODB_URI = process.env.MONGODB_URI;
+
+// Connect to MongoDB Atlas
+mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-});
+})
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
+  });
+
+app.get('/', (req, res) => res.send('API is live'));
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+
+
+
+
 
 const productSchema = new mongoose.Schema({
   title: { type: String, required: true },
